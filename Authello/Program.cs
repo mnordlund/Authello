@@ -69,20 +69,10 @@ namespace Authello
             Board b = new Board();
 
             IPlayer currentPlayer = player1;
+            var UI = new ConsoleUI(b);
 
             while (!b.GameOver)
             {
-                Console.Clear();
-
-                
-                Console.Write($"  Black: {b.getScore(Tile.Black).ToString("00.##")}  ");
-                Console.BackgroundColor = ConsoleColor.White;
-                Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine($"  White: {b.getScore(Tile.White).ToString("00.##")}  ");
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.White;
-
-                b.PrintBoard();
 
                 Console.WriteLine($"Current player: {currentPlayer.Player}");
 
@@ -97,17 +87,9 @@ namespace Authello
 
                 // Switch player
                 currentPlayer = currentPlayer == player1 ? player2 : player1;
-            }
-            Console.Clear();
-;
-            Console.Write($"  Black: {b.getScore(Tile.Black).ToString("00.##")}  ");
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.WriteLine($"  White: {b.getScore(Tile.White).ToString("00.##")}  ");
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
 
-            b.PrintBoard();
+                UI.UpdateUI();
+            }
             Console.WriteLine($"Game Over");
             if(b.getScore(player1.Player) > b.getScore(player2.Player))
             {

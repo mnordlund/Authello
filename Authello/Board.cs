@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Authello
 {
@@ -10,10 +11,12 @@ namespace Authello
         Black,
         White
     }
+
     class Board
     {
         public bool GameOver => getScore(Tile.None) == 0;
 
+        public Point LastMove { get; private set; }
 
         public int BoardSize => 8;
         private Tile[,] board;
@@ -37,42 +40,6 @@ namespace Authello
             board[3, 4] = Tile.Black;
             board[4, 3] = Tile.Black;
             board[4, 4] = Tile.White;
-        }
-
-        public void PrintBoard()
-        {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("  A B C D E F G H");
-            for (var y = 0; y < BoardSize; y++)
-            {
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write($"{y + 1} ");
-                Console.BackgroundColor = ConsoleColor.DarkGreen;
-
-                for (var x = 0; x < BoardSize; x++)
-                {
-                    switch (board[x, y])
-                    {
-                        case Tile.None:
-                            Console.Write("  ");
-                            break;
-                        case Tile.White:
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write("O ");
-                            break;
-                        case Tile.Black:
-                            Console.ForegroundColor = ConsoleColor.Black;
-                            Console.Write("O ");
-                            break;
-                    }
-                }
-                Console.WriteLine();
-            }
-
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public int getScore(Tile player)
@@ -118,6 +85,7 @@ namespace Authello
             if (score == 0) return false;
 
             board[x, y] = player;
+            LastMove = new Point(x, y);
 
             return true;
         }
