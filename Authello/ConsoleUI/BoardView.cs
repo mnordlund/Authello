@@ -8,12 +8,16 @@ namespace Authello.ConsoleUI
     {
         private static readonly bool DEBUG = false;
         public Board Board { get; set; }
+        public bool ShowLog { get; set; } = true;
 
         // Positions
         private Point blackScorePos;
         private Point whiteScorePos;
         private Point boardPos;
         private Point overlayPos;
+        private Point logPos;
+        private int logHeight = 5;
+        private int logWidth = 50;
         private Point endPos;
 
         // Colors
@@ -25,8 +29,13 @@ namespace Authello.ConsoleUI
         private ConsoleColor whitePlayerColor = ConsoleColor.White;
         private ConsoleColor blackPlayerColor = ConsoleColor.Black;
 
+        private ConsoleColor logBg = ConsoleColor.Black;
+        private ConsoleColor[] logFg = { ConsoleColor.DarkGray, ConsoleColor.Gray, ConsoleColor.White };
+
         // State
         private Tile[,] currentBoard;
+
+        private string[] log;
 
         public BoardView(Board board)
         {
@@ -36,6 +45,8 @@ namespace Authello.ConsoleUI
 
         public void CreateUI()
         {
+            log = new string[logHeight];
+
             Console.ResetColor();
             Console.Clear();
 
@@ -87,7 +98,10 @@ namespace Authello.ConsoleUI
                 Console.WriteLine();
             }
 
-            endPos = new Point(Console.CursorLeft, Console.CursorTop);
+            logPos = new Point(Console.CursorLeft, Console.CursorTop);
+            endPos = new Point(Console.CursorLeft, Console.CursorTop + logHeight);
+            Console.ResetColor();
+            Console.SetCursorPosition(endPos.X, endPos.Y);
         }
 
         public void UpdateUI()
@@ -141,6 +155,25 @@ namespace Authello.ConsoleUI
             if(DEBUG) DrawBoard(boardPos.X + 18, boardPos.Y, newBoard);
             Console.ResetColor();
             Console.SetCursorPosition(endPos.X, endPos.Y);
+        }
+        public void AddToLog(string message)
+        {
+            Console.BackgroundColor = logBg;
+            for(var i = 0; i < log.Length -1; i++)
+            {
+                log[i] = log[i + 1];
+                Console.SetCursorPosition(logPos.X, logPos.Y + i);
+                Console.ForegroundColor = logFg[i < logFg.Length ? i : logFg.Length - 1];
+                if (log[i] != null)
+                {
+                    Console.Write(log[i].PadRight(logWidth).Substring(0, logWidth));
+                }
+            }
+
+            log[log.Length - 1] = message;
+            Console.SetCursorPosition(logPos.X, logPos.Y + log.Length - 1);
+            Console.ForegroundColor = logFg[log.Length - 1 < logFg.Length ? log.Length - 1 : logFg.Length - 1];
+            Console.Write(log[log.Length - 1].PadRight(logWidth).Substring(0, logWidth));
         }
 
         public void GameOver()
