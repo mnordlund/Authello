@@ -1,5 +1,6 @@
 ﻿using Authello.Players;
 using System;
+using System.Drawing;
 
 namespace Authello.ConsoleUI
 {
@@ -15,6 +16,14 @@ namespace Authello.ConsoleUI
         private ConsoleColor menuFg = ConsoleColor.White;
         private ConsoleColor selectedBg = ConsoleColor.White;
         private ConsoleColor selectedFg = ConsoleColor.Black;
+        private ConsoleColor descriptionBg = ConsoleColor.DarkGray;
+        private ConsoleColor descriptionFg = ConsoleColor.White;
+
+        // Positons and sizes
+        private Point descriptionPoint;
+        private int DescriptionWidth = 30;
+        private int DescriptionHeight = 10;
+        private int itemWidth = 20;
 
         private void WriteItem(int index)
         {
@@ -31,7 +40,7 @@ namespace Authello.ConsoleUI
 
             Console.SetCursorPosition(0, index + firstItemRow);
 
-            Console.Write($"{index} {playerList[index].PlayerName.PadRight(20).Substring(0, 20)}");
+            Console.Write($"{index} {playerList[index].PlayerName.setLength(itemWidth)}");
         }
 
         private void UpdateSelectedIndex(int newSelectedIndex)
@@ -40,6 +49,8 @@ namespace Authello.ConsoleUI
             selectedIndex = newSelectedIndex;
             WriteItem(oldSelectedIndex);
             WriteItem(selectedIndex);
+
+            UpdateDescription();
         }
         public IPlayer Show(Tile playerTile)
         {
@@ -49,6 +60,7 @@ namespace Authello.ConsoleUI
 
             Console.WriteLine($"Choose {playerTile} player:");
             firstItemRow = Console.CursorTop;
+            descriptionPoint = new Point(itemWidth + 5, Console.CursorTop);
             playerList = PlayerFactory.ListAllIPlayers();
             var index = 0;
             selectedIndex = 0;
@@ -59,10 +71,34 @@ namespace Authello.ConsoleUI
                 index++;
             }
 
+            UpdateDescription();
+
             var retval = SelectLoop(playerList);
 
             retval.Player = playerTile;
             return retval;
+        }
+
+        private void UpdateDescription()
+        {
+            Console.BackgroundColor = descriptionBg;
+            Console.ForegroundColor = descriptionFg;
+
+            var desc = playerList[selectedIndex].PlayerDescription.transformToRows(DescriptionWidth);
+            for(int h = 0; h < DescriptionHeight; h++)
+            {
+                Console.SetCursorPosition(descriptionPoint.X, descriptionPoint.Y + h);
+
+                if (h < desc.Length)
+                {
+                    Console.Write(desc[h].setLength(DescriptionWidth));
+                }
+                else
+                {
+                    Console.Write(" ".setLength(DescriptionWidth));
+                }
+
+            }
         }
 
         private IPlayer SelectLoop(IPlayer[] playerList)

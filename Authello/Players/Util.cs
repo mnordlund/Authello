@@ -3,6 +3,7 @@ namespace Authello.Players
 {
     class Util
     {
+        // TODO Add function to list all valid moves given a board and a player.
         public static bool IsValidMove(Tile[,] board, int x, int y, Tile player)
         {
             // Sanity checks
