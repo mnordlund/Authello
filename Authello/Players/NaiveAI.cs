@@ -5,7 +5,9 @@ namespace Authello.Players
     class NaiveAI : IPlayer
     {
         public Tile Player { get; set; }
-        public string PlayerDescription => "Naive AI";
+        public string PlayerDescription => @"A Naive implementation that only tries to maximize the score given by each move.";
+
+        public string PlayerName => "Naive AI";
 
         public Point MakeMove(Tile[,] board)
         {

@@ -20,7 +20,9 @@ namespace Authello.Players
 
         public Tile Player { get; set; }
 
-        public string PlayerDescription => "Weighted AI";
+        public string PlayerDescription => "Uses a weighted score of each position of the board and makes the highest weighted available move.";
+
+        public string PlayerName => "Weighted AI";
 
         public Point MakeMove(Tile[,] board)
         {
@@ -41,43 +43,6 @@ namespace Authello.Players
             }
 
             return new Point(bestMoveX, bestMoveY);
-        }
-
-        public void mutateWeights()
-        {
-            var rnd = new Random();
-            for (int x = 0; x < weights.GetLength(0); x++)
-            {
-                for (int y = 0; y < weights.GetLength(1); y++)
-                {
-                    weights[x, y] += (rnd.NextDouble() - 0.5) * 0.005;
-                }
-            }
-        }
-
-        public void PrintWeights()
-        {
-            var culture = CultureInfo.CreateSpecificCulture("en-US");
-            for (int y = 0; y < weights.GetLength(1); y++)
-            {
-                Console.Write("{");
-                for (int x = 0; x < weights.GetLength(1); x++)
-                {
-                    Console.Write($"{weights[x,y].ToString(culture)},");
-                }
-                Console.WriteLine("},");
-            }
-        }
-
-        public void CloneWeights(double[,] newWeights)
-        {
-            for (int x = 0; x < weights.GetLength(0); x++)
-            {
-                for (int y = 0; y < weights.GetLength(1); y++)
-                {
-                    weights[x, y] = newWeights[x, y];
-                }
-            }
         }
     }
 }

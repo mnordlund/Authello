@@ -14,9 +14,11 @@ namespace Authello
 
     class Board
     {
-        public bool GameOver => getScore(Tile.None) == 0;
+        public bool GameOver => IsGameOver();
 
         public Point LastMove { get; private set; }
+        public int WhiteScore { get; private set; }
+        public int BlackScore { get; private set; }
 
         public int BoardSize => 8;
         private Tile[,] board;
@@ -42,18 +44,35 @@ namespace Authello
             board[4, 4] = Tile.White;
         }
 
-        public int getScore(Tile player)
+        private bool IsGameOver()
         {
-            int score = 0;
+            for(var x = 0; x < BoardSize; x++)
+            {
+                for(var y = 0; y < BoardSize; y++)
+                {
+                    // TODO: Check if any player can make a move in the free tile.
+                    if (board[x, y] == Tile.None) return false;
+                }
+            }
+            return true;
+        }
+        private void UpdateScore()
+        {
+            var blackScore = 0;
+            var whiteScore = 0;
+
             for (var x = 0; x < BoardSize; x++)
             {
                 for (var y = 0; y < BoardSize; y++)
                 {
-                    if (board[x, y] == player) score++;
+                    if (board[x, y] == Tile.Black) blackScore++;
+                    if (board[x, y] == Tile.White) whiteScore++;
                 }
             }
 
-            return score;
+            BlackScore = blackScore;
+            WhiteScore = whiteScore;
+            
         }
 
         public bool MakeMove(int x, int y, Tile player)
@@ -65,6 +84,8 @@ namespace Authello
 
             var otherPlayer = player == Tile.White ? Tile.Black : Tile.White;
 
+            // TODO: Use matrix to make this code nicer
+            // TODO: Could be done in parallel.
             // N
             var score = checkDirection(x, y, 0, -1, player, otherPlayer);
             // S
@@ -86,6 +107,7 @@ namespace Authello
 
             board[x, y] = player;
             LastMove = new Point(x, y);
+            UpdateScore();
 
             return true;
         }

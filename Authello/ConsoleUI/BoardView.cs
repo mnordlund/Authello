@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading;
 
-namespace Authello
+namespace Authello.ConsoleUI
 {
-    class ConsoleUI
+    class BoardView
     {
         private static readonly bool DEBUG = false;
         public Board Board { get; set; }
@@ -15,6 +13,7 @@ namespace Authello
         private Point blackScorePos;
         private Point whiteScorePos;
         private Point boardPos;
+        private Point overlayPos;
         private Point endPos;
 
         // Colors
@@ -29,7 +28,7 @@ namespace Authello
         // State
         private Tile[,] currentBoard;
 
-        public ConsoleUI(Board board)
+        public BoardView(Board board)
         {
             Board = board;
             CreateUI();
@@ -37,6 +36,7 @@ namespace Authello
 
         public void CreateUI()
         {
+            Console.ResetColor();
             Console.Clear();
 
             // Black Score
@@ -44,19 +44,20 @@ namespace Authello
             Console.ForegroundColor = blackScoreFg;
             Console.Write($"  Black: ");
             blackScorePos = new Point(Console.CursorLeft, Console.CursorTop);
-            Console.Write($"  {Board.getScore(Tile.Black).ToString("00.##")}  ");
+            Console.Write($"  {Board.BlackScore.ToString("00.##")}  ");
 
             // White Score
             Console.BackgroundColor = whiteScoreBg;
             Console.ForegroundColor = whiteScoreFg;
             Console.Write($"  White: ");
             whiteScorePos = new Point(Console.CursorLeft, Console.CursorTop);
-            Console.WriteLine($"  {Board.getScore(Tile.White).ToString("00.##")}  ");
+            Console.WriteLine($"  {Board.WhiteScore.ToString("00.##")}  ");
 
             // Board
             Console.ResetColor();
             Console.WriteLine("  A B C D E F G H");
             boardPos = new Point(Console.CursorLeft + 2, Console.CursorTop);
+            overlayPos = new Point(1, boardPos.Y + 2);
 
             currentBoard = Board.GetBoardArray();
 
@@ -95,13 +96,13 @@ namespace Authello
             Console.BackgroundColor = blackScoreBg;
             Console.ForegroundColor = blackScoreFg;
             Console.SetCursorPosition(blackScorePos.X, blackScorePos.Y);
-            Console.Write($"  {Board.getScore(Tile.Black).ToString("00.##")}  ");
+            Console.Write($"  {Board.BlackScore.ToString("00.##")}  ");
 
             // White Score
             Console.BackgroundColor = whiteScoreBg;
             Console.ForegroundColor = whiteScoreFg;
             Console.SetCursorPosition(whiteScorePos.X, whiteScorePos.Y);
-            Console.WriteLine($"  {Board.getScore(Tile.White).ToString("00.##")}  ");
+            Console.WriteLine($"  {Board.WhiteScore.ToString("00.##")}  ");
 
 
             // Board
@@ -111,6 +112,7 @@ namespace Authello
             var newBoard = Board.GetBoardArray();
 
             UpdateTile(move.X, move.Y, newBoard);
+            Thread.Sleep(200);
 
             bool[,] searchMatrix = { {true,true,true},
                                      {true,false,true},
@@ -118,6 +120,8 @@ namespace Authello
 
             for (var r = 1; r <= Board.BoardSize; r++)
             {
+                Thread.Sleep(200);
+
                 for (var dx = -1; dx <= 1; dx++)
                 {
                     for (var dy = -1; dy <= 1; dy++)
@@ -132,13 +136,43 @@ namespace Authello
                 if(DEBUG) PrintMatrix<bool>(boardPos.X + 38, boardPos.Y, searchMatrix);
 
                 if (!EvaluateMatrix(searchMatrix)) break;
-                Thread.Sleep(200);
-
             }
 
             if(DEBUG) DrawBoard(boardPos.X + 18, boardPos.Y, newBoard);
             Console.ResetColor();
             Console.SetCursorPosition(endPos.X, endPos.Y);
+        }
+
+        public void GameOver()
+        {
+            Console.SetCursorPosition(overlayPos.X, overlayPos.Y);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkGray;
+
+            Console.Write("+----------------+");
+            Console.CursorTop++;
+            Console.CursorLeft = overlayPos.X;
+            Console.Write("|   Game  Over   |");
+            Console.CursorTop++;
+            Console.CursorLeft = overlayPos.X;
+            var winner = "Draw ";
+            if(Board.BlackScore > Board.WhiteScore)
+            {
+                winner = "Black";
+            }
+            else if (Board.BlackScore < Board.WhiteScore)
+            {
+                winner = "White";
+            }
+            Console.Write($"| Winner:  {winner} |");
+            Console.CursorTop++;
+            Console.CursorLeft = overlayPos.X;
+            Console.Write("+----------------+");
+
+
+            Console.SetCursorPosition(endPos.X, endPos.Y);
+            Console.ResetColor();
         }
 
         private void DrawBoard(int posx, int posy, Tile[,] board)

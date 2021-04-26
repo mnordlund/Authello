@@ -13,6 +13,7 @@ namespace Authello.Players
             var otherPlayer = player == Tile.White ? Tile.Black : Tile.White;
 
             // TODO These could be done in parallel.
+            // TODO Use a matrix to make this code nicer.
             return 
                 checkDirection(board, x, y, 0, -1, player, otherPlayer) > 0 ||
                 checkDirection(board, x, y, 0, 1, player, otherPlayer) > 0  ||
@@ -33,6 +34,7 @@ namespace Authello.Players
             var otherPlayer = player == Tile.White ? Tile.Black : Tile.White;
 
             // TODO These could be done in parallel
+            // TODO Use matrix to make this code nicer
             // N
             var score = checkDirection(board, x, y, 0, -1, player, otherPlayer);
             // S
