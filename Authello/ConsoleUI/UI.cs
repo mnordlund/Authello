@@ -7,12 +7,20 @@ namespace Authello.ConsoleUI
 {
     class UI
     {
+        private static BoardView boardView;
         public static BoardView CreateBoardView(Board board)
         {
-            var bv = new BoardView(board);
-            bv.CreateUI();
-            return bv;
+            boardView = new BoardView(board);
+            boardView.CreateUI();
+            return boardView;
 
+        }
+
+        public static void AddToLog(string message)
+        {
+            if (boardView == null) return;
+
+            boardView.AddToLog(message);
         }
         public static (IPlayer Black, IPlayer White) ChoosePlayers()
         {

@@ -2,6 +2,7 @@
 using System;
 using Authello.ConsoleUI;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Authello
 {
@@ -16,9 +17,15 @@ namespace Authello
 
             var boardView = UI.CreateBoardView(b);
 
+            var sw = new Stopwatch();
+
             while (!b.GameOver)
             {
+                sw.Restart();
                 var move = currentPlayer.MakeMove(b.GetBoardArray());
+                sw.Stop();
+
+                UI.AddToLog($"{currentPlayer.Player} made a move in {sw.ElapsedMilliseconds}ms");
 
                 if(!b.MakeMove(move.X, move.Y, currentPlayer.Player))
                 {

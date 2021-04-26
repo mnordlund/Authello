@@ -16,7 +16,7 @@ namespace Authello.ConsoleUI
         private Point boardPos;
         private Point overlayPos;
         private Point logPos;
-        private int logHeight = 5;
+        private int logHeight = 8;
         private int logWidth = 50;
         private Point endPos;
 
@@ -70,6 +70,9 @@ namespace Authello.ConsoleUI
             boardPos = new Point(Console.CursorLeft + 2, Console.CursorTop);
             overlayPos = new Point(1, boardPos.Y + 2);
 
+            logPos = new Point(boardPos.X + 18, boardPos.Y);
+
+
             currentBoard = Board.GetBoardArray();
 
             for (var y = 0; y < Board.BoardSize; y++)
@@ -98,7 +101,6 @@ namespace Authello.ConsoleUI
                 Console.WriteLine();
             }
 
-            logPos = new Point(Console.CursorLeft, Console.CursorTop);
             endPos = new Point(Console.CursorLeft, Console.CursorTop + logHeight);
             Console.ResetColor();
             Console.SetCursorPosition(endPos.X, endPos.Y);
