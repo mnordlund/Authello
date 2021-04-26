@@ -21,7 +21,7 @@ namespace Authello.ConsoleUI
 
         // Positons and sizes
         private Point descriptionPoint;
-        private int DescriptionWidth = 30;
+        private int DescriptionWidth = 60;
         private int DescriptionHeight = 10;
         private int itemWidth = 20;
 

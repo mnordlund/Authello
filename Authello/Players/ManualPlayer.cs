@@ -7,7 +7,7 @@ namespace Authello.Players
     {
         public Tile Player { get; set; }
 
-        public string PlayerDescription =>"Allowes you to play against the computer or a friend.";
+        public string PlayerDescription =>"Allows you to play against the computer or a friend.";
 
         public string PlayerName => "Manual Player";
 

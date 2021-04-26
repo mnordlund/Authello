@@ -30,9 +30,23 @@ namespace Authello.ConsoleUI
 
                     if (words[i].Length > width)
                     {
-                        currentLineLength = 0;
-                        strings.Add(words[i].Substring(0, width));
-                        strings.Add("");
+                        var pos = 0;
+                        while(words[i].Length - pos > width)
+                        {
+                            strings.Add(words[i].Substring(pos, width));
+                            pos += width;
+                        }
+
+                        if (pos != words[i].Length)
+                        {
+                            strings.Add(words[i].Substring(pos, words[i].Length - pos) + " ");
+                            currentLineLength = strings[strings.Count - 1].Length + 1;
+                        }
+                        else 
+                        {
+                            currentLineLength = 0;
+                            strings.Add("");
+                        }
                     }
                     else
                     {
