@@ -16,7 +16,7 @@ namespace Authello.ConsoleUI
         private Point boardPos;
         private Point overlayPos;
         private Point logPos;
-        private int logHeight = 8;
+        private int logHeight = 25;
         private int logWidth = 50;
         private Point endPos;
 
@@ -30,7 +30,7 @@ namespace Authello.ConsoleUI
         private ConsoleColor blackPlayerColor = ConsoleColor.Black;
 
         private ConsoleColor logBg = ConsoleColor.Black;
-        private ConsoleColor[] logFg = { ConsoleColor.DarkGray, ConsoleColor.Gray, ConsoleColor.White };
+        private ConsoleColor[] logFg = { ConsoleColor.DarkGray, ConsoleColor.DarkGray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.White };
 
         // State
         private Tile[,] currentBoard;
@@ -101,7 +101,7 @@ namespace Authello.ConsoleUI
                 Console.WriteLine();
             }
 
-            endPos = new Point(Console.CursorLeft, Console.CursorTop + logHeight);
+            endPos = new Point(Console.CursorLeft, Console.CursorTop);
             Console.ResetColor();
             Console.SetCursorPosition(endPos.X, endPos.Y);
         }
@@ -161,10 +161,10 @@ namespace Authello.ConsoleUI
         public void AddToLog(string message)
         {
             Console.BackgroundColor = logBg;
-            for(var i = 0; i < log.Length -1; i++)
+            for(var i = 0; i < log.Length - 1; i++)
             {
                 log[i] = log[i + 1];
-                Console.SetCursorPosition(logPos.X, logPos.Y + i);
+                Console.SetCursorPosition(logPos.X, logPos.Y - 1 + log.Length - i);
                 Console.ForegroundColor = logFg[i < logFg.Length ? i : logFg.Length - 1];
                 if (log[i] != null)
                 {
@@ -173,9 +173,10 @@ namespace Authello.ConsoleUI
             }
 
             log[log.Length - 1] = message;
-            Console.SetCursorPosition(logPos.X, logPos.Y + log.Length - 1);
+            Console.SetCursorPosition(logPos.X, logPos.Y);
             Console.ForegroundColor = logFg[log.Length - 1 < logFg.Length ? log.Length - 1 : logFg.Length - 1];
             Console.Write(log[log.Length - 1].PadRight(logWidth).Substring(0, logWidth));
+            Console.SetCursorPosition(endPos.X, endPos.Y);
         }
 
         public void GameOver()

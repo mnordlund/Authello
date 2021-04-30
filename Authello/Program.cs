@@ -21,6 +21,7 @@ namespace Authello
 
             while (!b.GameOver)
             {
+                UI.AddToLog($"{currentPlayer.Player}s turn.");
                 sw.Restart();
                 var move = currentPlayer.MakeMove(b.GetBoardArray());
                 sw.Stop();

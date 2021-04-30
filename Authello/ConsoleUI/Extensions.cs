@@ -15,6 +15,7 @@ namespace Authello.ConsoleUI
         {
             var strings = new List<string>();
 
+            str = str.Replace(Environment.NewLine, " ");
             var words = str.Split(' ');
             var currentLineLength = 0;
             strings.Add("");
