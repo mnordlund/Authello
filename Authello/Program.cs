@@ -1,7 +1,4 @@
-﻿using Authello.Players;
-using System;
-using Authello.ConsoleUI;
-using System.Threading;
+﻿using Authello.ConsoleUI;
 using System.Diagnostics;
 
 namespace Authello
