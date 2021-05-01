@@ -54,13 +54,10 @@ namespace Authello
             var blackScore = 0;
             var whiteScore = 0;
 
-            for (var x = 0; x < BoardSize; x++)
+            foreach(var tile in board)
             {
-                for (var y = 0; y < BoardSize; y++)
-                {
-                    if (board[x, y] == Tile.Black) blackScore++;
-                    if (board[x, y] == Tile.White) whiteScore++;
-                }
+                if (tile == Tile.Black) blackScore++;
+                if (tile == Tile.White) whiteScore++;
             }
 
             BlackScore = blackScore;

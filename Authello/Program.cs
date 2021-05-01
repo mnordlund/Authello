@@ -23,7 +23,8 @@ namespace Authello
                 var move = currentPlayer.MakeMove(b.GetBoardArray());
                 sw.Stop();
 
-                UI.AddToLog($"{currentPlayer.Player} made a move in {sw.ElapsedMilliseconds}ms");
+
+                UI.AddToLog($"{currentPlayer.Player} made a move in {sw.ElapsedMilliseconds / 1000.0:N2}s");
 
                 if(!b.MakeMove(move.X, move.Y, currentPlayer.Player))
                 {
