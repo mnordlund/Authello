@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Authello.Players;
+using System;
 using System.Drawing;
 using System.Threading;
 
@@ -6,8 +7,7 @@ namespace Authello.ConsoleUI
 {
     class BoardView
     {
-        private static readonly bool DEBUG = false;
-        public Board Board { get; set; }
+        public Game Game { get; set; }
         public bool ShowLog { get; set; } = true;
 
         // Positions
@@ -33,13 +33,13 @@ namespace Authello.ConsoleUI
         private ConsoleColor[] logFg = { ConsoleColor.DarkGray, ConsoleColor.DarkGray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.Gray, ConsoleColor.White };
 
         // State
-        private Tile[,] currentBoard;
+        private Board currentBoard;
 
         private string[] log;
 
-        public BoardView(Board board)
+        public BoardView(Game game)
         {
-            Board = board;
+            Game = game;
             CreateUI();
         }
 
@@ -55,14 +55,14 @@ namespace Authello.ConsoleUI
             Console.ForegroundColor = blackScoreFg;
             Console.Write($"  Black: ");
             blackScorePos = new Point(Console.CursorLeft, Console.CursorTop);
-            Console.Write($"  {Board.BlackScore.ToString("00.##")}  ");
+            Console.Write($"  {Game.BlackScore.ToString("00.##")}  ");
 
             // White Score
             Console.BackgroundColor = whiteScoreBg;
             Console.ForegroundColor = whiteScoreFg;
             Console.Write($"  White: ");
             whiteScorePos = new Point(Console.CursorLeft, Console.CursorTop);
-            Console.WriteLine($"  {Board.WhiteScore.ToString("00.##")}  ");
+            Console.WriteLine($"  {Game.WhiteScore.ToString("00.##")}  ");
 
             // Board
             Console.ResetColor();
@@ -73,29 +73,30 @@ namespace Authello.ConsoleUI
             logPos = new Point(boardPos.X + 18, boardPos.Y);
 
 
-            currentBoard = Board.GetBoardArray();
+            currentBoard = Game.board;
+            var boards = currentBoard.UnpackBoards();
 
-            for (var y = 0; y < Board.BoardSize; y++)
+            for (var y = 0; y < 8; y++)
             {
                 Console.ResetColor();
                 Console.Write($"{y + 1} ");
                 Console.BackgroundColor = boardBg;
 
-                for (var x = 0; x < Board.BoardSize; x++)
+                for (var x = 0; x < 8; x++)
                 {
-                    switch (currentBoard[x, y])
+                    if((boards[(int)Player.Black][y] & Util.BitPos[x]) != 0)
                     {
-                        case Tile.None:
-                            Console.Write("  ");
-                            break;
-                        case Tile.White:
-                            Console.ForegroundColor = whitePlayerColor;
-                            Console.Write("O ");
-                            break;
-                        case Tile.Black:
-                            Console.ForegroundColor = blackPlayerColor;
-                            Console.Write("O ");
-                            break;
+                        Console.ForegroundColor = blackPlayerColor;
+                        Console.Write("O ");
+                    }
+                    else if((boards[(int)Player.White][y] & Util.BitPos[x]) != 0)
+                    {
+                        Console.ForegroundColor = whitePlayerColor;
+                        Console.Write("O ");
+                    }
+                    else
+                    {
+                        Console.Write("  ");
                     }
                 }
                 Console.WriteLine();
@@ -112,29 +113,57 @@ namespace Authello.ConsoleUI
             Console.BackgroundColor = blackScoreBg;
             Console.ForegroundColor = blackScoreFg;
             Console.SetCursorPosition(blackScorePos.X, blackScorePos.Y);
-            Console.Write($"  {Board.BlackScore.ToString("00.##")}  ");
+            Console.Write($"  {Game.BlackScore.ToString("00.##")}  ");
 
             // White Score
             Console.BackgroundColor = whiteScoreBg;
             Console.ForegroundColor = whiteScoreFg;
             Console.SetCursorPosition(whiteScorePos.X, whiteScorePos.Y);
-            Console.WriteLine($"  {Board.WhiteScore.ToString("00.##")}  ");
+            Console.WriteLine($"  {Game.WhiteScore.ToString("00.##")}  ");
 
+            DrawBoard(boardPos.X, boardPos.Y, Game.board);
 
+            // TODO Make animations work again.
+            /*
             // Board
             Console.BackgroundColor = boardBg;
 
-            var move = Board.LastMove;
-            var newBoard = Board.GetBoardArray();
+            var move = Game.LastMove;
+            var newBoard = Game.board;
 
-            UpdateTile(move.X, move.Y, newBoard);
+            var lastPlayer = (int)Game.CurrentPlayer.OtherPlayer();
+
+            Console.ForegroundColor = Game.CurrentPlayer.OtherPlayer() == Player.Black ? blackPlayerColor : whitePlayerColor;
+            Console.SetCursorPosition(boardPos.X + (move.X * 2), boardPos.Y + move.Y);
+            Console.Write("O ");
+
             Thread.Sleep(200);
 
             bool[,] searchMatrix = { {true,true,true},
                                      {true,false,true},
                                      {true,true,true} };
 
-            for (var r = 1; r <= Board.BoardSize; r++)
+            for (var r = 1; r <= 8; r++)
+            {
+                Thread.Sleep(200);
+                for(var dx = -1; dx <= 1; dx++)
+                {
+                    for(var dy = -1; dy <= 1; dy++)
+                    {
+                        if(searchMatrix[dx +1, dy + 1])
+                        {
+                            
+                        }
+                    }
+                }
+            }
+
+            UpdateTile(move.X, move.Y, newBoard);
+            Thread.Sleep(200);
+
+
+
+            for (var r = 1; r <= Game.BoardSize; r++)
             {
                 Thread.Sleep(200);
 
@@ -153,8 +182,7 @@ namespace Authello.ConsoleUI
 
                 if (!EvaluateMatrix(searchMatrix)) break;
             }
-
-            if(DEBUG) DrawBoard(boardPos.X + 18, boardPos.Y, newBoard);
+            */
             Console.ResetColor();
             Console.SetCursorPosition(endPos.X, endPos.Y);
         }
@@ -193,11 +221,11 @@ namespace Authello.ConsoleUI
             Console.CursorTop++;
             Console.CursorLeft = overlayPos.X;
             var winner = "Draw ";
-            if(Board.BlackScore > Board.WhiteScore)
+            if(Game.BlackScore > Game.WhiteScore)
             {
                 winner = "Black";
             }
-            else if (Board.BlackScore < Board.WhiteScore)
+            else if (Game.BlackScore < Game.WhiteScore)
             {
                 winner = "White";
             }
@@ -211,29 +239,31 @@ namespace Authello.ConsoleUI
             Console.ResetColor();
         }
 
-        private void DrawBoard(int posx, int posy, Tile[,] board)
+        private void DrawBoard(int posx, int posy, Board board)
         {
             Console.BackgroundColor = boardBg;
 
-            for(var y = 0; y < board.GetLength(1); y++)
+            var boards = board.UnpackBoards();
+
+            for (var y = 0; y < 8; y++)
             {
                 Console.SetCursorPosition(posx, posy + y);
-                for (var x = 0; x < board.GetLength(0); x++)
+                for (var x = 0; x < 8; x++)
                 {
-                    switch(board[x,y])
+                    if ((boards[(int)Player.Black][y] & Util.BitPos[x]) != 0)
                     {
-                        case Tile.Black:
-                            Console.ForegroundColor = blackPlayerColor;
-                            break;
-                        case Tile.White:
-                            Console.ForegroundColor = whitePlayerColor;
-                            break;
-                        case Tile.None:
-                            Console.ForegroundColor = boardBg;
-                            break;
+                        Console.ForegroundColor = blackPlayerColor;
+                        Console.Write("O ");
                     }
-
-                    Console.Write("O ");
+                    else if ((boards[(int)Player.White][y] & Util.BitPos[x]) != 0)
+                    {
+                        Console.ForegroundColor = whitePlayerColor;
+                        Console.Write("O ");
+                    }
+                    else
+                    {
+                        Console.Write("  ");
+                    }
                 }
             }
         }
@@ -262,10 +292,11 @@ namespace Authello.ConsoleUI
             }
         }
 
-        private bool UpdateTile(int x, int y, Tile[,] newBoard)
-        {
-            if (x < 0 || y < 0 || x >= Board.BoardSize || y >= Board.BoardSize) return false;
 
+        // TODO make animations work again.
+        /*
+        private bool UpdateTile(int x, int y, Board newBoard)
+        {
             if (newBoard[x, y] != currentBoard[x, y])
             {
                 // Draw
@@ -289,6 +320,6 @@ namespace Authello.ConsoleUI
                 return true;
             }
             return false;
-        }
+        }*/
     }
 }

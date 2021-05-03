@@ -1,13 +1,11 @@
-﻿using System.Drawing;
-
-namespace Authello.Players
+﻿namespace Authello.Players
 {
     interface IPlayer
     {
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
         public string PlayerName { get; }
         public string PlayerDescription { get; }
-        public Point MakeMove(Tile[,] board);
+        public (int X, int Y) MakeMove(Board board);
 
         
     }

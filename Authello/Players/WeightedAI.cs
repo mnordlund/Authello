@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 
 namespace Authello.Players
 {
@@ -18,31 +19,21 @@ namespace Authello.Players
             { 10.0,-10.0, 7.0, 2.0, 2.0,7.0,-10.0, 10.0, },
         };
 
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
 
         public string PlayerDescription => "Uses a weighted score of each position of the board and makes the highest weighted available move.";
 
         public string PlayerName => "Weighted AI";
 
-        public Point MakeMove(Tile[,] board)
+        public (int X, int Y) MakeMove(Board board)
         {
-            var bestMoveX = -1;
-            var bestMoveY = -1;
-            for (int x = 0; x < board.GetLength(0); x++)
-            {
-                for (int y = 0; y < board.GetLength(1); y++)
-                {
-                    if (!Util.IsValidMove(board, x, y, Player)) continue;
+            var moves = Util.ListAllMoves(board, Player);
 
-                    if ((bestMoveX < 0 && bestMoveY < 0) || weights[x,y] > weights[bestMoveX, bestMoveY])
-                    {
-                        bestMoveX = x;
-                        bestMoveY = y;
-                    }
-                }
-            }
+            if (moves.Length == 0) return (-1, -1);
 
-            return new Point(bestMoveX, bestMoveY);
+            var bestMove = moves.Aggregate((itemA, itemB) => weights[itemA.X, itemA.Y] > weights[itemB.X, itemB.Y] ? itemA : itemB);
+
+            return bestMove;
         }
     }
 }

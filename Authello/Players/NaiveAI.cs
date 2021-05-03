@@ -1,34 +1,34 @@
-﻿using System.Drawing;
+﻿using Authello.ConsoleUI;
 
 namespace Authello.Players
 {
     class NaiveAI : IPlayer
     {
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
         public string PlayerDescription => @"A Naive implementation that only tries to maximize the score given by each move.";
 
         public string PlayerName => "Naive AI";
 
-        public Point MakeMove(Tile[,] board)
+        public (int X, int Y) MakeMove(Board board)
         {
-            int bestMoveX = 0;
-            int bestMoveY = 0;
+            (int X, int Y) bestMove = (-1, -1);
             int bestMoveScore = 0;
 
-            for(int x = 0; x < board.GetLength(0); x++)
+
+            var moves = Util.ListAllMoves(board, Player);
+
+            foreach(var move in moves)
             {
-                for(int y = 0; y < board.GetLength(1); y++)
+                var moveScore = Util.GetMoveScore(board, move.X, move.Y, Player);
+                if (moveScore > bestMoveScore)
                 {
-                    var currentScore = Util.GetMoveScore(board, x, y, Player);
-                    if(currentScore > bestMoveScore)
-                    {
-                        bestMoveX = x;
-                        bestMoveY = y;
-                    }
+                    bestMove = move;
+                    bestMoveScore = moveScore;
                 }
             }
 
-            return new Point(bestMoveX, bestMoveY);
+            UI.AddToLog($"Best move found {bestMove}");
+            return bestMove;
         }
     }
 }
