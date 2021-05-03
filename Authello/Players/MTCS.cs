@@ -8,7 +8,7 @@ namespace Authello.Players
 {
     class MTCS : IPlayer
     {
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
 
         public string PlayerName => "MCTS";
 
@@ -17,11 +17,11 @@ namespace Authello.Players
 Based on the description at: https://en.wikipedia.org/wiki/Monte_Carlo_tree_search";
 
         // Configuration
-        public int ThinkTimeLimit { get; set; } = 1000;
+        public int ThinkTimeLimit { get; set; } = 10000;
 
         // State
         private TreeNode root;
-        public Point MakeMove(Tile[,] board)
+        public (int X, int Y) MakeMove(Board board)
         {
             // TODO keep tree from last move
             //root = null;
@@ -65,7 +65,7 @@ Based on the description at: https://en.wikipedia.org/wiki/Monte_Carlo_tree_sear
             // Select move
             var bestMove = root.BestMove;
             root = root.BestChild;
-            return new Point(bestMove.X, bestMove.Y);
+            return bestMove;
 
         }
 

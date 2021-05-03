@@ -192,6 +192,18 @@ namespace Authello.Players
             return endScore - startScore;
         }
 
+        public static int GetWinner(Board board)
+        {
+            var blackScore = GetScore(board, Player.Black);
+            var whiteScore = GetScore(board, Player.White);
+
+            if (blackScore > whiteScore) return (int)Player.Black;
+            if (blackScore < whiteScore) return (int)Player.White;
+
+            // Draw
+            return 3;
+        }
+
         public static byte[][] UnpackBoards(this Board board)
         {
             var boardArray = new byte[2][];

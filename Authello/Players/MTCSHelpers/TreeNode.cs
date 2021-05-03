@@ -8,8 +8,8 @@ namespace Authello.Players.MTCSHelpers
     {
 
         public TreeNode Parent { get; }
-        private Tile[,] Board { get; }
-        public Tile player { get; }
+        private Board Board { get; }
+        public Player player { get; }
 
         public (int X, int Y) Move { get; }
 
@@ -18,7 +18,7 @@ namespace Authello.Players.MTCSHelpers
 
         private TreeNode[] Children { get; set; }
         public bool IsLeaf { get; private set; } = false;
-        public Tile Winner { get; private set; } = Tile.None;
+        public int Winner { get; private set; }
 
         public bool IsComplete { get; private set; }
         public (int X, int Y) BestMove => GetBestMove();
@@ -36,7 +36,7 @@ namespace Authello.Players.MTCSHelpers
             return Children.Sum((item) => item.NodeCount);
         }
 
-        public TreeNode(Tile[,] board, Tile player, int x, int y, TreeNode parent = null)
+        public TreeNode(Board board, Player player, int x, int y, TreeNode parent = null)
         {
             this.player = player;
             Move = (x, y);
@@ -72,7 +72,7 @@ namespace Authello.Players.MTCSHelpers
             }
         }
 
-        public Tile Visit()
+        public int Visit()
         {
             if(Children == null && !IsLeaf)
             {
@@ -95,7 +95,7 @@ namespace Authello.Players.MTCSHelpers
 
             var winner = nextChild.Visit();
 
-            if(winner == player)
+            if(winner == (int)player)
             {
                 Wins++;
                 //scores[nextNode].Wins++;
@@ -143,7 +143,7 @@ namespace Authello.Players.MTCSHelpers
             return Children[bestMove].Move;
         }
 
-        public TreeNode GetChildWithBoard(Tile[,] board)
+        public TreeNode GetChildWithBoard(Board board)
         {
             if (Children == null) return null;
 
