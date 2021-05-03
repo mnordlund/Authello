@@ -3,195 +3,210 @@ using System.Collections.Generic;
 
 namespace Authello.Players
 {
-    static class Util
+    public static class Util
     {
-        public static bool CompareBoards(Tile[,] boardA, Tile[,] boardB)
+        public static readonly byte[] BitsInByte ={ 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8, };
+        public static readonly byte[] BitPos = { 0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1 };
+        public static bool CompareBoards(Board boardA, Board boardB)
         {
-            if (boardA.GetLength(0) != boardB.GetLength(0) || boardA.GetLength(1) != boardB.GetLength(1)) return false;
+            return boardA.BlackTileMap == boardB.BlackTileMap && boardA.WhiteTileMap == boardB.WhiteTileMap;
+        }
 
-            for(var x = 0; x < boardA.GetLength(0); x++)
+        public static int GetScore(Board board, Player player)
+        {
+            var score = 0;
+            var boards = board.UnpackBoards();
+            for (int i = 0; i < 8; i++)
             {
-                for(var y =0; y < boardB.GetLength(1); y++)
-                {
-                    if (boardA[x, y] != boardB[x, y]) return false;
-                }
+                score += BitsInByte[boards[(int)player][i]];
             }
-            return true;
-        }
-
-        public static Tile GetWinner(Tile[,] board)
-        {
-            var white = 0;
-            var black = 0;
-
-            for (var x = 0; x < board.GetLength(0); x++)
-            {
-                for (var y = 0; y < board.GetLength(1); y++)
-                {
-                    switch (board[x, y])
-                    {
-                        case Tile.Black:
-                            black++;
-                            break;
-                        case Tile.White:
-                            white++;
-                            break;
-                    }
-                }
-            }
-            if (white == black) return Tile.None;
-            if (white < black) return Tile.Black;
-            return Tile.White;
-        }
-
-        public static Tile[,] MakeMove(Tile[,] board, int x, int y, Tile player)
-        {
-            var retBoard = (Tile[,])board.Clone();
-            var otherPlayer = player == Tile.Black ? Tile.White : Tile.Black;
-
-            bool[,] searchMatrix = { {true,true,true},
-                                     {true,false,true},
-                                     {true,true,true} };
-
-            for (var dx = -1; dx <= 1; dx++)
-            {
-                for (var dy = -1; dy <= 1; dy++)
-                {
-                    if (searchMatrix[dx + 1, dy + 1])
-                    {
-                        searchMatrix[dx + 1, dy + 1] = checkDirection(retBoard, x, y, dx, dy, player, otherPlayer) != 0;
-                    }
-                }
-            }
-
-            retBoard[x, y] = player;
-
-            for (var dx = -1; dx <= 1; dx++)
-            {
-                for (var dy = -1; dy <= 1; dy++)
-                {
-                    if (searchMatrix[dx + 1, dy + 1])
-                    {
-                        swapDirection(retBoard, x, y, dx, dy, player, otherPlayer);
-                    }
-                }
-            }
-
-            return retBoard;
-        }
-
-        public static Tile OtherPlayer(this Tile player)
-        {
-            return player == Tile.Black ? Tile.White : Tile.Black;
-        }
-
-        public static (int X, int Y)[] ListAllMoves(Tile[,] board, Tile player)
-        {
-            var movesList = new List<(int X, int Y)>();
-
-            for (var x = 0; x < board.GetLength(0); x++)
-            {
-                for (var y = 0; y < board.GetLength(1); y++)
-                {
-                    if (IsValidMove(board, x, y, player)) movesList.Add((x, y));
-                }
-            }
-
-            //if (movesList.Count == 0) return null;
-
-            return movesList.ToArray();
-        }
-        public static bool IsValidMove(Tile[,] board, int x, int y, Tile player)
-        {
-            // Sanity checks
-            if (x < 0 || x > board.GetLength(0) || y < 0 || y > board.GetLength(1)) return false;
-            if (board[x, y] != Tile.None) return false;
-            if (player == Tile.None) return false;
-
-            var otherPlayer = player == Tile.White ? Tile.Black : Tile.White;
-
-            // TODO These could be done in parallel.
-            // TODO Use a matrix to make this code nicer.
-            return
-                checkDirection(board, x, y, 0, -1, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, 0, 1, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, -1, 0, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, 1, 0, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, -1, -1, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, 1, -1, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, -1, 1, player, otherPlayer) > 0 ||
-                checkDirection(board, x, y, 1, 1, player, otherPlayer) > 0;
-        }
-        public static int GetMoveScore(Tile[,] board, int x, int y, Tile player)
-        {
-            // Sanity checks
-            if (x < 0 || x > board.GetLength(0) || y < 0 || y > board.GetLength(1)) return 0;
-            if (board[x, y] != Tile.None) return 0;
-            if (player == Tile.None) return 0;
-
-            var otherPlayer = player == Tile.White ? Tile.Black : Tile.White;
-
-            // TODO These could be done in parallel
-            // TODO Use matrix to make this code nicer
-            // N
-            var score = checkDirection(board, x, y, 0, -1, player, otherPlayer);
-            // S
-            score += checkDirection(board, x, y, 0, 1, player, otherPlayer);
-            // W
-            score += checkDirection(board, x, y, -1, 0, player, otherPlayer);
-            // E
-            score += checkDirection(board, x, y, 1, 0, player, otherPlayer);
-            // NW
-            score += checkDirection(board, x, y, -1, -1, player, otherPlayer);
-            // NE
-            score += checkDirection(board, x, y, 1, -1, player, otherPlayer);
-            // SW
-            score += checkDirection(board, x, y, -1, 1, player, otherPlayer);
-            // SE
-            score += checkDirection(board, x, y, 1, 1, player, otherPlayer);
-
             return score;
         }
 
-        private static int checkDirection(Tile[,] board, int x, int y, int dx, int dy, Tile player, Tile otherPlayer)
+        public static Player OtherPlayer(this Player player)
         {
-            int posx = x + dx;
-            int posy = y + dy;
-            if (posx < 0 || posx >= board.GetLength(0) || posy < 0 || posy >= board.GetLength(1)) return 0;
-            if (board[posx, posy] != otherPlayer) return 0;
-            int score = 1;
-
-            while (board[posx, posy] == otherPlayer)
-            {
-                posx += dx;
-                posy += dy;
-                score++;
-
-                if (posx < 0 || posx >= board.GetLength(0) || posy < 0 || posy >= board.GetLength(1)) return 0;
-            }
-
-            if (board[posx, posy] == player)
-            {
-                return score;
-            }
-            return 0;
+            return (Player)(((int)player + 1) % 2);
         }
 
-        private static void swapDirection(Tile[,] board, int x, int y, int dx, int dy, Tile player, Tile otherPlayer)
+        /// <summary>
+        /// Makes a move on a board, returns a new Board with the appropriate tiles flipped.
+        /// Assumes the move is valid, use IsValidMove to ensure move is valid before calling this function.
+        /// </summary>
+        public static Board MakeMove(Board board, int x, int y, Player player)
         {
-            int posx = x + dx;
-            int posy = y + dy;
+            var boards = board.UnpackBoards();
+            // Set move position
+            boards[(int)player][y] |= BitPos[x];
 
-            while (board[posx, posy] == otherPlayer)
+            // Get directions to flip
+            var flipMatrix = CalculateFlipMatrix(board, x, y, player);
+
+            // Flip bits
+            byte[,] searchMatrix = { { (byte)((BitPos[x] & flipMatrix[0, 0])) , (byte)(BitPos[x] & flipMatrix[0, 1]), (byte)((BitPos[x] & flipMatrix[0, 2])) },
+                                     { (byte)((BitPos[x] & flipMatrix[1, 0])), 0x00     , (byte)(BitPos[x] & flipMatrix[1, 2]) },
+                                     { (byte)((BitPos[x] & flipMatrix[2, 0])), (byte)(BitPos[x] & flipMatrix[2, 1]), (byte)((BitPos[x] & flipMatrix[2, 2])) } };
+
+             var otherPlayer = (int)player.OtherPlayer();
+
+            for (var ypos = 1; ypos < 8; ypos++)
             {
 
-                board[posx, posy] = player;
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    byte[] directions = {
+                    (byte)(searchMatrix[dy + 1, 0] << ypos), // Left
+                    searchMatrix[dy + 1, 1], // Straight
+                    (byte)(searchMatrix[dy + 1, 2] >> ypos) // Right
+                    };
 
-                posx += dx;
-                posy += dy;
+                    // No searches to be done in this direction
+                    if (((byte)(directions[0] | directions[1] | directions[2])) == 0x00) continue;
 
-                if (posx < 0 || posx >= board.GetLength(0) || posy < 0 || posy >= board.GetLength(1)) return;
+                    var row = y + (dy * ypos);
+
+                    for (var direction = 0; direction < 3; direction++)
+                    {
+                        if (row < 0 || row >= 8 || directions[direction] == 0x00)
+                        {
+                            // Stop flipping in this direction
+                            searchMatrix[dy + 1, direction] = 0x00;
+                            continue;
+                        }
+
+                        // Do we still have a match?
+                        if ((boards[otherPlayer][row] & directions[direction]) != directions[direction])
+                        {
+                            // Stop flipping in this direction
+                            searchMatrix[dy + 1, direction] = 0x00;
+                        }
+                        else
+                        {
+                            // Flip tile
+                            boards[otherPlayer][row] &= (byte)~directions[direction];
+                            boards[(int)player][row] |= directions[direction];
+                        }
+                    }
+                }
             }
+
+            return boards.packBoard();
+
+        }
+
+        private static byte[,] CalculateFlipMatrix(Board board, int x, int y, Player player, bool breakOnTrue = false)
+        {
+            var otherPlayer = (int)player.OtherPlayer();
+
+            var boards = board.UnpackBoards();
+
+            byte[,] searchMatrix = { { BitPos[x], BitPos[x], BitPos[x] },
+                                     { BitPos[x], 0x00     , BitPos[x] },
+                                     { BitPos[x], BitPos[x], BitPos[x] } };
+
+            // Initialized to false
+            byte[,] flipMatrix = new byte[3, 3];
+
+
+            for (var ypos = 1; ypos < 8; ypos++)
+            {
+
+                for (var dy = -1; dy <= 1; dy++)
+                {
+                    byte[] directions = 
+                        {
+                        (byte)(searchMatrix[dy + 1, 0] << ypos),
+                        searchMatrix[dy + 1, 1],
+                        (byte)(searchMatrix[dy + 1, 2] >> ypos)
+                        };
+
+                    // No searches to be done in this direction
+                    if (((byte)(directions[0] | directions[1] | directions[2])) == 0x00) continue;
+
+                    var row = y + (dy * ypos);
+                    for ( var direction = 0; direction < 3; direction++)
+                    {
+                        if (row < 0 || row >= 8 || directions[direction] == 0x00)
+                        {
+                            // Stop searching in this direction
+                            searchMatrix[dy + 1, direction] = 0x00;
+                            continue;
+                        }
+
+                        // Do we still have a match?
+                        if ((boards[otherPlayer][row] & directions[direction]) != directions[direction])
+                        {
+                            // No check if player tile then we have a match.
+                            if (ypos > 1 && (boards[(int)player][row] & directions[direction]) == directions[direction])
+                            {
+                                // We have a match thus the move is valid.
+                                flipMatrix[dy + 1, direction] = 0xFF;
+
+                                if (breakOnTrue) return flipMatrix;
+
+                            }
+                            // Stop searching in this direction
+                            searchMatrix[dy + 1, direction] = 0x00;
+                        }
+                    }
+                }
+            }
+            return flipMatrix;
+        }
+
+        /// <summary>
+        /// Lists all valid moves on a given board for a given player.
+        /// Returns the moves as an (X, Y) array.
+        /// </summary>
+        public static (int X, int Y)[] ListAllMoves(Board board, Player player)
+        {
+            var validMoves = new List<(int X, int Y)>();
+            for(var y = 0; y < 8; y++)
+            {
+                for(var x = 0; x < 8; x++)
+                {
+                    if(IsValidMove(board, x, y, player))
+                    {
+                        validMoves.Add((x, y));
+                    }
+                }
+            }
+            return validMoves.ToArray();
+        }
+        public static bool IsValidMove(Board board, int x, int y, Player player)
+        {
+            var boards = board.UnpackBoards();
+            if (x < 0 || x >= 8 || y < 0 || y >= 8) return false;
+            if ((boards[0][y] & BitPos[x]) != 0 || (boards[1][y] & BitPos[x]) != 0) return false;
+
+            var flipMatrix = CalculateFlipMatrix(board, x, y, player, true);
+
+            return (flipMatrix[0, 0] | flipMatrix[0, 1] | flipMatrix[0, 2] |
+                    flipMatrix[1, 0] | flipMatrix[1, 1] | flipMatrix[1, 2] |
+                    flipMatrix[2, 0] | flipMatrix[2, 1] | flipMatrix[2, 2]  ) == 0xFF;
+        }
+        public static int GetMoveScore(Board board, int x, int y, Player player)
+        {
+            var startScore = GetScore(board, player);
+            var endScore = GetScore(MakeMove(board, x, y, player), player);
+
+            return endScore - startScore;
+        }
+
+        public static byte[][] UnpackBoards(this Board board)
+        {
+            var boardArray = new byte[2][];
+            boardArray[0] = System.BitConverter.GetBytes(board.BlackTileMap);
+            boardArray[1] = System.BitConverter.GetBytes(board.WhiteTileMap);
+
+            return boardArray;
+        }
+
+        public static Board packBoard(this byte[][] boardArray)
+        {
+            Board board;
+            board.BlackTileMap = System.BitConverter.ToUInt64(boardArray[0]);
+            board.WhiteTileMap = System.BitConverter.ToUInt64(boardArray[1]);
+            return board;
         }
     }
 }
