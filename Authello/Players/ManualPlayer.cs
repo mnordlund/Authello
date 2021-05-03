@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Drawing;
 
 namespace Authello.Players
 {
     class ManualPlayer : IPlayer
     {
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
 
         public string PlayerDescription =>"Allows you to play against the computer or a friend.";
 
         public string PlayerName => "Manual Player";
 
-        public Point MakeMove(Tile[,] board)
+        public (int X, int Y) MakeMove(Board board)
         {
             int x, y;
             for (; ; )
@@ -37,7 +36,7 @@ namespace Authello.Players
                 Console.WriteLine($"Invalid move {x}, {y}");
             }
 
-            return new Point(x, y);
+            return (x, y);
         }
     }
 }

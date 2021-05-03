@@ -1,7 +1,4 @@
-﻿using Authello.Players;
-using System;
-using Authello.ConsoleUI;
-using System.Threading;
+﻿using Authello.ConsoleUI;
 using System.Diagnostics;
 
 namespace Authello
@@ -10,31 +7,28 @@ namespace Authello
     {
         static void Main(string[] args)
         {
-            Board b = new Board();
+            Game othello = new Game();
 
             var (Black, White) = UI.ChoosePlayers();
-            var currentPlayer = Black;
+            var currentPlayer = othello.CurrentPlayer == Player.Black ? Black : White;
 
-            var boardView = UI.CreateBoardView(b);
+            var boardView = UI.CreateBoardView(othello);
 
             var sw = new Stopwatch();
 
-            while (!b.GameOver)
+            while (!othello.GameOver)
             {
                 UI.AddToLog($"{currentPlayer.Player}s turn.");
                 sw.Restart();
-                var move = currentPlayer.MakeMove(b.GetBoardArray());
+                var move = currentPlayer.MakeMove(othello.board);
                 sw.Stop();
 
-                UI.AddToLog($"{currentPlayer.Player} made a move in {sw.ElapsedMilliseconds}ms");
+                UI.AddToLog($"{currentPlayer.Player} made a move in {sw.ElapsedMilliseconds / 1000.0:N2}s");
 
-                if(!b.MakeMove(move.X, move.Y, currentPlayer.Player))
-                {
-                    boardView.AddToLog($"{currentPlayer.Player} made an invalid move ({move}).");
-                }
+                othello.MakeMove(move.X, move.Y);
 
                 // Switch player
-                currentPlayer = currentPlayer == Black ? White : Black;
+                currentPlayer = othello.CurrentPlayer == Player.Black ? Black : White;
 
                 boardView.UpdateUI();
             }

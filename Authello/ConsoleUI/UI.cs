@@ -8,7 +8,7 @@ namespace Authello.ConsoleUI
     class UI
     {
         private static BoardView boardView;
-        public static BoardView CreateBoardView(Board board)
+        public static BoardView CreateBoardView(Game board)
         {
             boardView = new BoardView(board);
             boardView.CreateUI();
@@ -25,7 +25,7 @@ namespace Authello.ConsoleUI
         public static (IPlayer Black, IPlayer White) ChoosePlayers()
         {
             var menu = new PlayerMenu();
-            return (menu.Show(Tile.Black), menu.Show(Tile.White));
+            return (menu.Show(Player.Black), menu.Show(Player.White));
         }
     }
 }
