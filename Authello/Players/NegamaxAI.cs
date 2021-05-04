@@ -10,13 +10,13 @@ namespace Authello.Players
         class TreeNode
         {
             public bool IsLeaf;
-            public Tile[,] board;
+            public Board board;
             public TreeNode[] children;
             public TreeNode bestChild;
             public (int x, int y) move;
         }
 
-        public Tile Player { get; set; }
+        public Player Player { get; set; }
 
         public string PlayerName => "Negamax";
 
@@ -24,12 +24,13 @@ namespace Authello.Players
 An implementation of the negamax algorithm. Based on the discription given in: https://en.wikipedia.org/wiki/Negamax.
 ";
 
-        public int Depth { get; set; } = 10;
+        public int Depth { get; set; } = 5;
 
         private TreeNode Root { get; set; }
 
-        public Point MakeMove(Tile[,] board)
+        public (int X, int Y) MakeMove(Board board)
         {
+            Root = null;
             if (Root == null)
             {
                 Root = new TreeNode()
@@ -67,7 +68,7 @@ An implementation of the negamax algorithm. Based on the discription given in: h
             return GetBestMove(Root);
         }
 
-        private void CreateChildren(TreeNode node, Tile player)
+        private void CreateChildren(TreeNode node, Player player)
         {
             var moves = Util.ListAllMoves(node.board, player);
             if (moves.Length == 0)
@@ -100,7 +101,7 @@ An implementation of the negamax algorithm. Based on the discription given in: h
             }
         }
 
-        private double Negamax(TreeNode node, int depth, double alpha, double beta, Tile player)
+        private double Negamax(TreeNode node, int depth, double alpha, double beta, Player player)
         {
             if(depth == 0 || node.IsLeaf)
             {
@@ -127,28 +128,25 @@ An implementation of the negamax algorithm. Based on the discription given in: h
                 if (alpha >= beta)
                     break;
             }
+            if (node.bestChild == null && node.children.Length != 0)
+            {
+                UI.AddToLog("Found no best child");
+            }
             return value;
         }
 
-        private double GetHeuristicValue(TreeNode node, Tile player)
+        private double GetHeuristicValue(TreeNode node, Player player)
         {
             // TODO Use weights in heuristics.
-            var score = 0;
-            var otherPlayerScore = 0;
-
-            var otherPlayer = player.OtherPlayer();
-            foreach(var tile in node.board)
-            {
-                if (tile == player) score++;
-                if (tile == otherPlayer) otherPlayerScore++;
-            }
+            var score = Util.GetScore(node.board, player);
+            var otherPlayerScore = Util.GetScore(node.board, player.OtherPlayer());
 
             return (double)score/(double)otherPlayerScore;
         }
 
-        private Point GetBestMove(TreeNode node)
+        private (int X, int Y) GetBestMove(TreeNode node)
         {
-            return new Point(node.bestChild.move.x, node.bestChild.move.y);
+            return node.bestChild.move;
         }
     }
 }
