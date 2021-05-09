@@ -1,6 +1,5 @@
 ﻿using Authello.ConsoleUI;
 using System;
-using System.Drawing;
 
 namespace Authello.Players
 {
@@ -21,7 +20,7 @@ namespace Authello.Players
         public string PlayerName => "Negamax";
 
         public string PlayerDescription => @"
-An implementation of the negamax algorithm. Based on the discription given in: https://en.wikipedia.org/wiki/Negamax.
+An implementation of the negamax algorithm with alpha beta pruning. Based on the discription given in: https://en.wikipedia.org/wiki/Negamax.
 ";
 
         public int Depth { get; set; } = 5;
@@ -30,7 +29,6 @@ An implementation of the negamax algorithm. Based on the discription given in: h
 
         public (int X, int Y) MakeMove(Board board)
         {
-            Root = null;
             if (Root == null)
             {
                 Root = new TreeNode()
@@ -62,7 +60,7 @@ An implementation of the negamax algorithm. Based on the discription given in: h
                 }
             }
 
-            var result = Negamax(Root, Depth,Double.MinValue, Double.MaxValue, Player);
+            var result = Negamax(Root, Depth, double.NegativeInfinity, double.PositiveInfinity, Player);
             UI.AddToLog($"Negamax result: {result}");
 
             return GetBestMove(Root);
@@ -86,7 +84,7 @@ An implementation of the negamax algorithm. Based on the discription given in: h
                 {
                     node.IsLeaf = true;
                 }
-
+                return;
             }
             node.children = new TreeNode[moves.Length];
 
@@ -103,18 +101,20 @@ An implementation of the negamax algorithm. Based on the discription given in: h
 
         private double Negamax(TreeNode node, int depth, double alpha, double beta, Player player)
         {
-            if(depth == 0 || node.IsLeaf)
-            {
-                var multiplier = player == Player ? 1 : -1;
-                return multiplier * GetHeuristicValue(node, player);
-            }
 
-            if(node.children == null)
+            if (node.children == null)
             {
                 CreateChildren(node, player);
             }
 
+            if (depth == 0 || node.IsLeaf)
+            {
+                return GetHeuristicValue(node, player);
+            }
+
+
             var value = Double.NegativeInfinity;
+
             foreach(var child in node.children)
             {
                 var negamax = -Negamax(child, depth - 1, -beta, -alpha, player.OtherPlayer());
@@ -137,7 +137,6 @@ An implementation of the negamax algorithm. Based on the discription given in: h
 
         private double GetHeuristicValue(TreeNode node, Player player)
         {
-            // TODO Use weights in heuristics.
             var score = Util.GetScore(node.board, player);
             var otherPlayerScore = Util.GetScore(node.board, player.OtherPlayer());
 
