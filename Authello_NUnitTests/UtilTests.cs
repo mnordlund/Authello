@@ -35,8 +35,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x4;
-            board.WhiteTileMap = 0x78;
+            board.BlackTileMap = 0x20;
+            board.WhiteTileMap = 0x1E;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -53,12 +53,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x4, board.BlackTileMap);
-            Assert.AreEqual(0x78, board.WhiteTileMap);
+            Assert.AreEqual(0x20, board.BlackTileMap);
+            Assert.AreEqual(0x1E, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0xFC, newBoard.BlackTileMap);
+            Assert.AreEqual(0x3F, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -85,8 +85,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x20;
-            board.WhiteTileMap = 0x1E;
+            board.BlackTileMap = 0x4;
+            board.WhiteTileMap = 0x78;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -103,12 +103,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x20, board.BlackTileMap);
-            Assert.AreEqual(0x1E, board.WhiteTileMap);
+            Assert.AreEqual(0x4, board.BlackTileMap);
+            Assert.AreEqual(0x78, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x3F, newBoard.BlackTileMap);
+            Assert.AreEqual(0xFC, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -139,8 +139,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x80000000;
-            board.WhiteTileMap = 0x80808000000000;
+            board.BlackTileMap = 0x1000000;
+            board.WhiteTileMap = 0x1010100000000;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -157,12 +157,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x80000000, board.BlackTileMap);
-            Assert.AreEqual(0x80808000000000, board.WhiteTileMap);
+            Assert.AreEqual(0x1000000, board.BlackTileMap);
+            Assert.AreEqual(0x1010100000000, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x8080808080000000, newBoard.BlackTileMap);
+            Assert.AreEqual(0x101010101000000, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -176,6 +176,7 @@ namespace Authello_NUnitTests
              * -------B
              * --------
              * --------
+             * --------
              * 
              * Avalable move 7,0
              * Make move
@@ -186,15 +187,15 @@ namespace Authello_NUnitTests
              * -------B
              * -------B
              * -------B
-             * -------B
+             * --------
              * --------
              * --------
              * 
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x100000000;
-            board.WhiteTileMap = 0x1010100;
+            board.BlackTileMap = 0x8000000000;
+            board.WhiteTileMap = 0x80808000;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -211,12 +212,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x100000000, board.BlackTileMap);
-            Assert.AreEqual(0x1010100, board.WhiteTileMap);
+            Assert.AreEqual(0x8000000000, board.BlackTileMap);
+            Assert.AreEqual(0x80808000, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x101010101, newBoard.BlackTileMap);
+            Assert.AreEqual(0x8080808080, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -247,8 +248,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x80;
-            board.WhiteTileMap = 0x10204000;
+            board.BlackTileMap = 0x1;
+            board.WhiteTileMap = 0x8040200;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -265,12 +266,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x80, board.BlackTileMap);
-            Assert.AreEqual(0x10204000, board.WhiteTileMap);
+            Assert.AreEqual(0x1, board.BlackTileMap);
+            Assert.AreEqual(0x8040200, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x810204080, newBoard.BlackTileMap);
+            Assert.AreEqual(0x1008040201, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -301,8 +302,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x800000000;
-            board.WhiteTileMap = 0x10204000;
+            board.BlackTileMap = 0x1000000000;
+            board.WhiteTileMap = 0x8040200;
 
             (int X, int y)[] availableMoves = Util.ListAllMoves(board, Player.Black);
 
@@ -319,12 +320,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x800000000, board.BlackTileMap);
-            Assert.AreEqual(0x10204000, board.WhiteTileMap);
+            Assert.AreEqual(0x1000000000, board.BlackTileMap);
+            Assert.AreEqual(0x8040200, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x810204080, newBoard.BlackTileMap);
+            Assert.AreEqual(0x1008040201, newBoard.BlackTileMap);
         }
 
         [Test]
@@ -338,6 +339,7 @@ namespace Authello_NUnitTests
              * ---WWW--
              * --W-W-W-
              * -B--B--B
+             * --------
              * 
              * Avalable move 4, 3
              * Make move
@@ -348,14 +350,15 @@ namespace Authello_NUnitTests
              * ---BBB--
              * BBBBBBBB
              * ---BBB--
-             * --B---B-
-             * -B-----B
+             * --B-B-B-
+             * -B--B--B
+             * --------
              * 
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x49000081000049;
-            board.WhiteTileMap = 0x2A1C761C2A00;
+            board.BlackTileMap = 0x92000081000092;
+            board.WhiteTileMap = 0x54386E385400;
 
             int scoreBlack = Util.GetScore(board, Player.Black);
             int scoreWhite = Util.GetScore(board, Player.White);
@@ -380,12 +383,12 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x49000081000049, board.BlackTileMap);
-            Assert.AreEqual(0x2A1C761C2A00, board.WhiteTileMap);
+            Assert.AreEqual(0x92000081000092, board.BlackTileMap);
+            Assert.AreEqual(0x54386E385400, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
             Assert.AreEqual(0x0, newBoard.WhiteTileMap);
-            Assert.AreEqual(0x492A1CFF1C2A49, newBoard.BlackTileMap);
+            Assert.AreEqual(0x925438FF385492, newBoard.BlackTileMap);
 
             // Scores
             Assert.AreEqual(8, scoreBlack);
@@ -423,8 +426,8 @@ namespace Authello_NUnitTests
              */
             // Setup
             Board board = new Board();
-            board.BlackTileMap = 0x2A1C761C2A00;
-            board.WhiteTileMap = 0x49000081000049;
+            board.BlackTileMap = 0x54386E385400;
+            board.WhiteTileMap = 0x92000081000092;
 
             int scoreBlack = Util.GetScore(board, Player.Black);
             int scoreWhite = Util.GetScore(board, Player.White);
@@ -449,11 +452,11 @@ namespace Authello_NUnitTests
 
             // Move should not affect the original board.
             Assert.AreNotSame(board, newBoard);
-            Assert.AreEqual(0x2A1C761C2A00, board.BlackTileMap);
-            Assert.AreEqual(0x49000081000049, board.WhiteTileMap);
+            Assert.AreEqual(0x54386E385400, board.BlackTileMap);
+            Assert.AreEqual(0x92000081000092, board.WhiteTileMap);
 
             // The move has resulted in the correct board.
-            Assert.AreEqual(0x492A1CFF1C2A49, newBoard.WhiteTileMap);
+            Assert.AreEqual(0x925438FF385492, newBoard.WhiteTileMap);
             Assert.AreEqual(0x0, newBoard.BlackTileMap);
 
             // Scores
