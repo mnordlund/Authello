@@ -28,10 +28,7 @@ namespace Authello
 
         public void Initialize()
         {
-            Board newBoard;
-            newBoard.BlackTileMap = 0x1008000000;
-            newBoard.WhiteTileMap = 0x810000000;
-            board = newBoard;
+            board = new Board(0x1008000000, 0x810000000); ;
         }
 
         private bool IsGameOver()
